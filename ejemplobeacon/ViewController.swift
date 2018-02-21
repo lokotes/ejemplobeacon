@@ -14,6 +14,9 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
 
     @IBOutlet weak var lblLocacion: UILabel!
     var locationManager: CLLocationManager!
+    @IBOutlet weak var lblMinor: UILabel!
+    var beaconcerca = ""
+    var beaconcercano : CLBeacon?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,20 +47,50 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     func startScanning() {
         
         let uuid = UUID(uuidString: "A596EBF0-163B-4F0C-B55F-B9DEDFB7CF78")!
-        let beaconRegion = CLBeaconRegion(proximityUUID: uuid, major: 1000, minor: 1007, identifier: "amp")
+        let beaconRegion = CLBeaconRegion(proximityUUID: uuid, major: 1000, identifier: "gato")
         //let beaconRegion = CLBeaconRegion(proximityUUID: uuid, major: 1000, identifier: "")
         locationManager.startMonitoring(for: beaconRegion)
         locationManager.startRangingBeacons(in: beaconRegion)
+        
+        //locationManager.allowsBackgroundLocationUpdates = true
+    }
+    
+    func stopScanning() {
+        
+        let uuid = UUID(uuidString: "A596EBF0-163B-4F0C-B55F-B9DEDFB7CF78")!
+        let beaconRegion = CLBeaconRegion(proximityUUID: uuid, major: 1000, identifier: "gato")
+        //let beaconRegion = CLBeaconRegion(proximityUUID: uuid, major: 1000, identifier: "")
+        locationManager.stopMonitoring(for: beaconRegion)
+        locationManager.stopRangingBeacons(in: beaconRegion)
+        
         //locationManager.allowsBackgroundLocationUpdates = true
     }
     
     func locationManager(_ manager: CLLocationManager, didRangeBeacons beacons: [CLBeacon], in region: CLBeaconRegion) {
-        //print(beacons.count)
+        //let knownBeacons = beacons.filter{ $0.proximity != CLProximity.unknown }
+        print(beacons.count)
         //print(beacons[0].)
         
         if beacons.count > 0 {
             updateDistance(beacons[0])
+            /*if(beacons[0].minor==1007){
+                beaconcerca="amp"
+            }else{
+                beaconcerca="dark"
+            }*/
+            if(beaconcercano==nil){
+                beaconcercano=beacons[0]
+            }
+            var beaconcito = beacons[0]
+            for beacon in beacons{
+                if((beaconcito.accuracy)>beacon.accuracy){
+                    beaconcito=beacon
+                }
+            }
+            beaconcercano=beaconcito
         }
+        
+     
     }
     
     func updateDistance(_ beacon: CLBeacon) {
@@ -79,6 +112,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
                 self.view.backgroundColor = UIColor.red
                 self.lblLocacion.text = " (approx. \(beacon.accuracy)m)"
                 print("junto")
+                if(beacon.minor==1007){
+                    self.lblMinor.text = "amp"
+                }else{
+                    self.lblMinor.text = "dark"
+                }
+                
             }
         }
     }
@@ -105,6 +144,20 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
         
     }
+    
+    @IBAction func minorbuttonpresed(_ sender: Any) {
+        if(beaconcercano?.minor==1007){
+            self.lblMinor.text = "amp"
+        }else{
+            self.lblMinor.text = "dark"
+        }
+        
+        
+        //self.lblMinor.text = beaconcerca
+        
+    }
+    
+    
     
     
     
